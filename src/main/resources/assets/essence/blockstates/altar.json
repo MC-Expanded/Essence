@@ -1,0 +1,36 @@
+{
+  "variants": {
+    "part=altar": {
+      "model": "essence:block/altar"
+    },
+    "part=north": {
+      "model": "essence:block/pedestal",
+      "y": 180
+    },
+    "part=north_east": {
+      "model": "essence:block/pedestal",
+      "y": 180
+    },
+    "part=east": {
+      "model": "essence:block/pedestal",
+      "y": 270
+    },
+    "part=south_east": {
+      "model": "essence:block/pedestal"
+    },
+    "part=south": {
+      "model": "essence:block/pedestal"
+    },
+    "part=south_west": {
+      "model": "essence:block/pedestal"
+    },
+    "part=west": {
+      "model": "essence:block/pedestal",
+      "y": 90
+    },
+    "part=north_west": {
+      "model": "essence:block/pedestal",
+      "y": 180
+    }
+  }
+}

@@ -14,7 +14,7 @@ public interface EssenceBlockEntities
      DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
             DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, Essence.MOD_ID);
 
-     Supplier<BlockEntityType<AltarBlockEntity>> STAND = BLOCK_ENTITIES.register("stand",
+     Supplier<BlockEntityType<AltarBlockEntity>> ALTAR = BLOCK_ENTITIES.register("altar",
             () -> new BlockEntityType<>(AltarBlockEntity::new, EssenceBlocks.ALTAR.get()));
 
     static void register(IEventBus eventBus) {

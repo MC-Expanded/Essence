@@ -5,9 +5,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -30,7 +32,7 @@ import java.util.function.Function;
 
 public class AltarBlock extends AbstractMultiBlock implements IPreviewableMultiblock
 {
-    public static final EnumProperty<StandPart> PART = EnumProperty.create("stand_part", StandPart.class);
+    public static final EnumProperty<AltarPart> PART = EnumProperty.create("part", AltarPart.class);
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
 
     public AltarBlock(BlockBehaviour.Properties properties)
@@ -39,11 +41,12 @@ public class AltarBlock extends AbstractMultiBlock implements IPreviewableMultib
                 .noOcclusion()
                 .destroyTime(2)
         );
-        registerDefaultState(defaultBlockState().setValue(PART, StandPart.ALTAR));
+        registerDefaultState(defaultBlockState().setValue(PART, AltarPart.ALTAR));
     }
 
     @Override
-    public List<BlockPos> makeFullBlockShape(Level level, BlockPos center, BlockState blockState, @org.jetbrains.annotations.Nullable BlockEntity blockEntity, @org.jetbrains.annotations.Nullable Direction direction) {
+    public List<BlockPos> makeFullBlockShape(Level level, BlockPos center, BlockState blockState, @org.jetbrains.annotations.Nullable BlockEntity blockEntity, @org.jetbrains.annotations.Nullable Direction direction)
+    {
         assert direction != null;
         return List.of(
                 center,
@@ -55,12 +58,12 @@ public class AltarBlock extends AbstractMultiBlock implements IPreviewableMultib
                 center.south().south().south().west().west().west(),
                 center.west().west().west().west(),
                 center.north().north().north().west().west().west()
-                );
+        );
     }
 
-
     @Override
-    public RenderShape getMultiblockRenderShape(BlockState state, boolean isCenter) {
+    public RenderShape getMultiblockRenderShape(BlockState state, boolean isCenter)
+    {
         return RenderShape.MODEL;
     }
 
@@ -73,7 +76,7 @@ public class AltarBlock extends AbstractMultiBlock implements IPreviewableMultib
     @Override
     public BlockState getStateForEachBlock(BlockState state, BlockPos pos, BlockPos centerOffset, Level level, @org.jetbrains.annotations.Nullable Direction direction)
     {
-        state = state.setValue(PART, IBlockPosOffsetEnum.fromOffset(StandPart.class, centerOffset, direction, StandPart.ALTAR));
+        state = state.setValue(PART, IBlockPosOffsetEnum.fromOffset(AltarPart.class, centerOffset, Direction.NORTH, AltarPart.ALTAR));
 
         return state;
     }
@@ -91,18 +94,42 @@ public class AltarBlock extends AbstractMultiBlock implements IPreviewableMultib
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult)
+    protected InteractionResult useItemOn(ItemStack itemStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult)
     {
         if (level.isClientSide()) return InteractionResult.SUCCESS;
 
         BlockPos center = IMultiBlock.getCenter(level, pos);
-        if (center.equals(pos) && level.getBlockEntity(pos) instanceof AltarBlockEntity abe)
+        if (level.getBlockEntity(pos) instanceof AltarBlockEntity abe)
         {
-            //if clicked on center altar
-            player.openMenu(new SimpleMenuProvider(abe, Component.empty()), center);
-        }
+            //altar
+            if (center.equals(pos))
+            {
+                //if clicked on center altar.json
+                player.openMenu(new SimpleMenuProvider(abe, Component.empty()), center);
+            }
+            //pedestals
+            else
+            {
+                //pick up item from pedestal
+                if(itemStack.isEmpty() && !abe.getItem().isEmpty())
+                {
+                    player.setItemInHand(hand, abe.getItem());
+                    abe.setItem(ItemStack.EMPTY);
+                    return InteractionResult.CONSUME;
+                }
 
-        return InteractionResult.SUCCESS;
+                //place item on pedestal
+                if(!itemStack.isEmpty() && abe.getItem().isEmpty())
+                {
+                    abe.setItem(itemStack);
+                    player.setItemInHand(hand, ItemStack.EMPTY);
+                    return InteractionResult.CONSUME;
+                }
+
+
+            }
+        }
+        return super.useItemOn(itemStack, state, level, pos, player, hand, hitResult);
     }
 
     @Override
@@ -116,15 +143,16 @@ public class AltarBlock extends AbstractMultiBlock implements IPreviewableMultib
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState)
     {
-        return EssenceBlockEntities.STAND.get().create(blockPos, blockState);
+        return EssenceBlockEntities.ALTAR.get().create(blockPos, blockState);
     }
 
     @Override
-    public boolean hasCustomBE() {
+    public boolean hasCustomBE()
+    {
         return true;
     }
 
-    public enum StandPart implements StringRepresentable, IBlockPosOffsetEnum
+    public enum AltarPart implements StringRepresentable, IBlockPosOffsetEnum
     {
         ALTAR("altar", pos -> pos),
         PEDESTAL_N("north", pos -> pos.north().north().north().north()),
@@ -140,7 +168,7 @@ public class AltarBlock extends AbstractMultiBlock implements IPreviewableMultib
         private final String name;
         public final Function<BlockPos, BlockPos> offset;
 
-        StandPart(String name, Function<BlockPos, BlockPos> offset)
+        AltarPart(String name, Function<BlockPos, BlockPos> offset)
         {
             this.name = name;
             this.offset = offset;
@@ -158,7 +186,8 @@ public class AltarBlock extends AbstractMultiBlock implements IPreviewableMultib
         }
 
         @Override
-        public Function<BlockPos, BlockPos> getOffsetFunction() {
+        public Function<BlockPos, BlockPos> getOffsetFunction()
+        {
             return offset;
         }
     }
