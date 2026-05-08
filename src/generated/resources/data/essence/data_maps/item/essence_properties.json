@@ -1,0 +1,12 @@
+{
+  "values": {
+    "minecraft:lapis_lazuli": {
+      "behaviours": [],
+      "exp_cost": 2.0,
+      "push_direction": {
+        "x": 1.0,
+        "y": 0.0
+      }
+    }
+  }
+}
