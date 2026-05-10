@@ -9,4 +9,6 @@ public class AltarRenderState extends BlockEntityRenderState
     public final BlockModelRenderState frameModel = new BlockModelRenderState();
     public final ItemStackRenderState item = new ItemStackRenderState();
     public int offset;
+    public float playerClose;
+    public AltarBlock.AltarPart part;
 }

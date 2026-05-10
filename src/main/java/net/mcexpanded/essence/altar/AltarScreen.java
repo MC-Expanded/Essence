@@ -186,11 +186,10 @@ public class AltarScreen extends AbstractContainerScreen<AltarMenu>
                 guiGraphics.enableScissor(-123123, 0, 121212, 122121);
 
 
-
                 guiGraphics.submitPictureInPictureRenderState(new SpinningItemPictureInPictureRenderer.RenderState(
                         renderState,
-                        (float) ((Math.sin(Util.getMillis() / 1000f + 235)) * 15),
-                        (float) ((Math.sin(Util.getMillis() / 1000f + 235632)) * 15),
+                        (float) ((Math.sin(Util.getMillis() / 1000f + 235)) * 25),
+                        (float) ((Math.sin(Util.getMillis() / 1000f + 235632)) * 25),
                         (float) ((Math.sin(Util.getMillis() / 1000f + 123657)) * 5),
                         (int) (0 + xDragOffset), (int) (0 + yDragOffset), (int) (width + xDragOffset), (int) (height + yDragOffset),
                         16 * scrollScale, guiGraphics.peekScissorStack()

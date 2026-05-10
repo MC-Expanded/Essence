@@ -32,6 +32,12 @@ dependencies {
     //tiny multiblock lib
     jarJar(implementation("maven.modrinth:tiny-multiblock-lib:neo-26.1-${tiny_multiblock_lib_version}"))
 
+    //iris
+    //runtimeOnly("maven.modrinth:iris:YEGDGnJM")
+
+    //sodium
+    //runtimeOnly("maven.modrinth:sodium:tLByymK0")
+
 }
 
 base {

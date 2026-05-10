@@ -7,12 +7,14 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -29,6 +31,8 @@ public class AltarBlockEntity extends AbstractMultiBlockEntity implements MenuPr
     private ItemStack item = ItemStack.EMPTY;
     public long seed = 0;
     public int tickOffset = new Random().nextInt(100000);
+    public float playerClose = 0;
+    public float playerCloseOld = 0;
 
     public AltarBlockEntity(BlockPos pos, BlockState blockState)
     {
@@ -167,5 +171,22 @@ public class AltarBlockEntity extends AbstractMultiBlockEntity implements MenuPr
     {
         this.item = item;
         sync();
+    }
+
+    public static void tick(Level level, BlockPos worldPosition, BlockState blockState, AltarBlockEntity entity)
+    {
+        entity.playerCloseOld = entity.playerClose;
+        Player player = level.getNearestPlayer(
+                worldPosition.getX() + 0.5,
+                worldPosition.getY() + 0.5,
+                worldPosition.getZ() + 0.5,
+                2.5f, false);
+        if (player != null)
+            entity.playerClose += 0.1F;
+        else
+            entity.playerClose -= 0.1F;
+
+        entity.playerClose = Mth.clamp(entity.playerClose, 0.0F, 1.0F);
+
     }
 }

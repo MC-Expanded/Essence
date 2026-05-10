@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.EnchantingTableBlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -94,6 +95,17 @@ public class AltarBlock extends AbstractMultiBlock implements IPreviewableMultib
     public BlockState getDefaultStateForPreviews(Direction direction)
     {
         return IPreviewableMultiblock.super.getDefaultStateForPreviews(direction.getOpposite());
+    }
+
+    @Override
+    public <T extends BlockEntity> @org.jspecify.annotations.Nullable BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> type) {
+        return level.isClientSide() ? createTickerHelper(type, EssenceBlockEntities.ALTAR.get(), AltarBlockEntity::tick) : null;
+    }
+
+    protected static <E extends BlockEntity, A extends BlockEntity> @org.jspecify.annotations.Nullable BlockEntityTicker<A> createTickerHelper(
+            BlockEntityType<A> actual, BlockEntityType<E> expected, BlockEntityTicker<? super E> ticker
+    ) {
+        return expected == actual ? (BlockEntityTicker<A>)ticker : null;
     }
 
     @Override
@@ -179,12 +191,6 @@ public class AltarBlock extends AbstractMultiBlock implements IPreviewableMultib
     public boolean hasCustomBE()
     {
         return true;
-    }
-
-    @Override
-    public @org.jspecify.annotations.Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> type)
-    {
-        return super.getTicker(level, blockState, type);
     }
 
     public enum AltarPart implements StringRepresentable, IBlockPosOffsetEnum
