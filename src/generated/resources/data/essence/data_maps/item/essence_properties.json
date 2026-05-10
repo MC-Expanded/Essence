@@ -1,11 +1,48 @@
 {
   "values": {
-    "minecraft:lapis_lazuli": {
+    "minecraft:amethyst_shard": {
       "behaviours": [],
+      "color": -4169522,
       "exp_cost": 2.0,
       "push_direction": {
-        "x": 1.0,
-        "y": 0.0
+        "x": 0.0,
+        "y": -20.0
+      }
+    },
+    "minecraft:lapis_block": {
+      "behaviours": [],
+      "color": -11708202,
+      "exp_cost": 2.0,
+      "push_direction": {
+        "x": 0.0,
+        "y": 60.0
+      }
+    },
+    "minecraft:lapis_lazuli": {
+      "behaviours": [],
+      "color": -11708202,
+      "exp_cost": 2.0,
+      "push_direction": {
+        "x": 0.0,
+        "y": 20.0
+      }
+    },
+    "minecraft:prismarine_crystals": {
+      "behaviours": [],
+      "color": -7216417,
+      "exp_cost": 2.0,
+      "push_direction": {
+        "x": -10.0,
+        "y": 10.0
+      }
+    },
+    "minecraft:quartz": {
+      "behaviours": [],
+      "color": -1644826,
+      "exp_cost": 2.0,
+      "push_direction": {
+        "x": 10.0,
+        "y": 10.0
       }
     }
   }

@@ -10,15 +10,24 @@ public record EssenceProperties
         (
                 Position pushDirection,
                 List<Identifier> behaviours,
-                float cost
+                float cost,
+                int color
         )
 {
+
+    public EssenceProperties(Position pushDirection, float cost, int color)
+    {
+        this(pushDirection, List.of(), cost, color);
+    }
+
+    public static final EssenceProperties EMPTY = new EssenceProperties(new Position(0, 0), List.of(), 0, 0);
 
     public static final Codec<EssenceProperties> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
                     Position.CODEC.fieldOf("push_direction").forGetter(EssenceProperties::pushDirection),
                     Identifier.CODEC.listOf().fieldOf("behaviours").forGetter(EssenceProperties::behaviours),
-                    Codec.FLOAT.fieldOf("exp_cost").forGetter(EssenceProperties::cost)
+                    Codec.FLOAT.fieldOf("exp_cost").forGetter(EssenceProperties::cost),
+                    Codec.INT.fieldOf("color").forGetter(EssenceProperties::color)
             ).apply(instance, EssenceProperties::new)
     );
 

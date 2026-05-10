@@ -1,6 +1,7 @@
 package net.mcexpanded.essence.altar;
 
 import net.mcexpanded.essence.registry.EssenceBlockEntities;
+import net.mcexpanded.essence.registry.EssenceDataMaps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -104,14 +105,35 @@ public class AltarBlock extends AbstractMultiBlock implements IPreviewableMultib
             //altar
             if (center.equals(pos))
             {
-                //if clicked on center altar.json
-                player.openMenu(new SimpleMenuProvider(abe, Component.empty()), center);
+                //remove item
+                if (!abe.getItem().isEmpty() && player.isCrouching())
+                {
+                    player.addItem(abe.getItem());
+                    abe.setItem(ItemStack.EMPTY);
+                    return InteractionResult.CONSUME;
+                }
+
+                //place item
+                if (abe.getItem().isEmpty() && !player.isCrouching())
+                {
+                    abe.setItem(itemStack);
+                    player.setItemInHand(hand, ItemStack.EMPTY);
+                    return InteractionResult.SUCCESS;
+                }
+
+                //open screen
+                if (!abe.getItem().isEmpty() && !player.isCrouching())
+                {
+                    player.openMenu(new SimpleMenuProvider(abe, Component.empty()), center);
+                    return InteractionResult.SUCCESS;
+                }
+
             }
             //pedestals
             else
             {
                 //pick up item from pedestal
-                if(itemStack.isEmpty() && !abe.getItem().isEmpty())
+                if (itemStack.isEmpty() && !abe.getItem().isEmpty())
                 {
                     player.setItemInHand(hand, abe.getItem());
                     abe.setItem(ItemStack.EMPTY);
@@ -119,14 +141,19 @@ public class AltarBlock extends AbstractMultiBlock implements IPreviewableMultib
                 }
 
                 //place item on pedestal
-                if(!itemStack.isEmpty() && abe.getItem().isEmpty())
+                if (!itemStack.isEmpty() && abe.getItem().isEmpty())
                 {
-                    abe.setItem(itemStack);
-                    player.setItemInHand(hand, ItemStack.EMPTY);
-                    return InteractionResult.CONSUME;
+                    if(EssenceDataMaps.getOrDefault(itemStack, EssenceDataMaps.ESSENCE_PROPERTIES, null) != null)
+                    {
+                        abe.setItem(itemStack);
+                        player.setItemInHand(hand, ItemStack.EMPTY);
+                        return InteractionResult.CONSUME;
+                    }
+                    else
+                    {
+                        player.sendOverlayMessage(Component.literal("The pedestal rejects this item"));
+                    }
                 }
-
-
             }
         }
         return super.useItemOn(itemStack, state, level, pos, player, hand, hitResult);

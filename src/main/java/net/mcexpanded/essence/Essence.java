@@ -14,7 +14,7 @@ public class Essence
 {
     public static final String MOD_ID = "essence";
 
-    public static final ResourceKey<Registry<NodeGroup>> NODE_GROUP_REGISTRY_KEY =
+    public static final ResourceKey<Registry<EnchantmentNodeGroup>> NODE_GROUP_REGISTRY_KEY =
             ResourceKey.createRegistryKey(rl("node_group"));
 
     public static Identifier rl(String ns, String path)
