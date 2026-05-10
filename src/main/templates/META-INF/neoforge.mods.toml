@@ -1,5 +1,7 @@
 license="${mod_license}"
 
+[[mixins]]
+config="essence.mixins.json"
 
 [[mods]]
 modId="${mod_id}" #mandatory

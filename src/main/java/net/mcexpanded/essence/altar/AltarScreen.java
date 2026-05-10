@@ -1,6 +1,7 @@
 package net.mcexpanded.essence.altar;
 
 import com.mojang.datafixers.util.Pair;
+import com.sun.jna.platform.win32.WinBase;
 import net.mcexpanded.essence.Essence;
 import net.mcexpanded.essence.registry.EnchantmentNode;
 import net.mcexpanded.essence.registry.EssenceProperties;
@@ -12,16 +13,21 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.item.TrackingItemStackRenderState;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec2;
 import org.joml.Matrix3x2fStack;
 import org.joml.Vector2f;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -165,18 +171,34 @@ public class AltarScreen extends AbstractContainerScreen<AltarMenu>
         //green dot at 0,0
         guiGraphics.fill(-1, -1, 1, 1, 0xff00ff00);
 
-        //render item offset by total lines distance
+        //render main item offset by total lines distance
         {
             guiGraphics.pose().pushMatrix();
             guiGraphics.pose().translate(xCurrentPosition, yCurrentPosition);
-            //wavy effect
-            guiGraphics.pose().translate(new Vector2f(
-                            (float) Math.sin(Util.getMillis() / 800d),
-                            (float) Math.sin(Util.getMillis() / 1000d)
-                    )
-            );
-            //render item
-            guiGraphics.item(menu.be.getItem(), -8, -8);
+
+            //render main item
+            ItemStack item = menu.be.getItem();
+            if (!item.isEmpty())
+            {
+                TrackingItemStackRenderState renderState = new TrackingItemStackRenderState();
+                Minecraft.getInstance().getItemModelResolver().updateForTopItem(renderState, item, ItemDisplayContext.FIXED, null, null, 0);
+
+                guiGraphics.enableScissor(-123123, 0, 121212, 122121);
+
+
+
+                guiGraphics.submitPictureInPictureRenderState(new SpinningItemPictureInPictureRenderer.RenderState(
+                        renderState,
+                        (float) ((Math.sin(Util.getMillis() / 1000f + 235)) * 15),
+                        (float) ((Math.sin(Util.getMillis() / 1000f + 235632)) * 15),
+                        (float) ((Math.sin(Util.getMillis() / 1000f + 123657)) * 5),
+                        (int) (0 + xDragOffset), (int) (0 + yDragOffset), (int) (width + xDragOffset), (int) (height + yDragOffset),
+                        16 * scrollScale, guiGraphics.peekScissorStack()
+                ));
+
+                guiGraphics.disableScissor();
+            }
+
             guiGraphics.pose().popMatrix();
             guiGraphics.pose().popMatrix();
         }
@@ -271,6 +293,7 @@ public class AltarScreen extends AbstractContainerScreen<AltarMenu>
                 guiGraphics.tooltip(this.font, list, rawMouseX, rawMouseY, DefaultTooltipPositioner.INSTANCE, identifier);
             }
         }
+
         super.extractRenderState(guiGraphics, rawMouseX, rawMouseY, a);
     }
 
