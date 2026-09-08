@@ -1,26 +1,37 @@
-license="${mod_license}"
+modLoader="javafml" #mandatory
+
+loaderVersion="[2,]" #mandatory
+
+license="MIT"
+
+issueTrackerURL="https://discord.gg/WsuFsGSegD" #optional
+
+[[mods]] #mandatory
+modId="essence"
+version="${mod_version}"
+displayName="${mod_name}"
+displayURL="http://curseforge.com/minecraft/mc-mods/essence"
+logoFile = "icon.png"
+mod_authors="${mod_authors}" #optional
+description='''A very enchanting mod'''
 
 [[mixins]]
 config="essence.mixins.json"
 
-[[mods]]
-modId="${mod_id}" #mandatory
-version="${mod_version}" #mandatory
-displayName="${mod_name}" #mandatory
-description='''
-An expansion of Minecraft's Enchanting system
-'''
+# In neoforge.mods.toml:
+[[accessTransformers]]
+file="META-INF/accesstransformer.cfg"
 
-[[dependencies.${mod_id}]] #optional
-    modId="neoforge" #mandatory
-    type="required" #mandatory
-    versionRange="[${neo_version},)" #mandatory
-    ordering="NONE"
-    side="BOTH"
+[[dependencies.essence]] #optional
+modId="neoforge" #mandatory
+type="required" #mandatory
+versionRange="${neo_version_range}" #mandatory
+ordering="AFTER"
+side="BOTH"
 
-[[dependencies.${mod_id}]]
-    modId="minecraft"
-    type="required"
-    versionRange="${minecraft_version_range}"
-    ordering="NONE"
-    side="BOTH"
+[[dependencies.essence]]
+modId="minecraft"
+type="required"
+versionRange="${minecraft_version_range}"
+ordering="AFTER"
+side="BOTH"

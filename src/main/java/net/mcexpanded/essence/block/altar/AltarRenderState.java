@@ -10,5 +10,4 @@ public class AltarRenderState extends BlockEntityRenderState
     public final ItemStackRenderState item = new ItemStackRenderState();
     public int offset;
     public float playerClose;
-    public AltarBlock.AltarPart part;
 }

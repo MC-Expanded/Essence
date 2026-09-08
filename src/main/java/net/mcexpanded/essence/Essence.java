@@ -32,6 +32,5 @@ public class Essence
         EssenceItems.register(modEventBus);
         EssenceBlocks.register(modEventBus);
         EssenceBlockEntities.register(modEventBus);
-        EssenceMenuTypes.register(modEventBus);
     }
 }
