@@ -1,7 +1,7 @@
 package net.mcexpanded.essence.registry;
 
 import net.mcexpanded.essence.Essence;
-import net.mcexpanded.essence.altar.AltarBlockEntity;
+import net.mcexpanded.essence.block.altar.AltarBlockEntity;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;

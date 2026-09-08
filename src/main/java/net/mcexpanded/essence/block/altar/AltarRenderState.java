@@ -1,4 +1,4 @@
-package net.mcexpanded.essence.altar;
+package net.mcexpanded.essence.block.altar;
 
 import net.minecraft.client.renderer.block.BlockModelRenderState;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;

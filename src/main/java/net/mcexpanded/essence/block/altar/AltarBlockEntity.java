@@ -1,4 +1,4 @@
-package net.mcexpanded.essence.altar;
+package net.mcexpanded.essence.block.altar;
 
 import com.mojang.datafixers.util.Pair;
 import net.mcexpanded.essence.registry.*;

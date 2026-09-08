@@ -1,8 +1,7 @@
-package net.mcexpanded.essence.altar;
+package net.mcexpanded.essence.block.altar;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.mcexpanded.essence.Essence;
 import net.mcexpanded.essence.registry.EssenceBlocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -51,7 +50,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity, Alta
         float x = (float) (Math.sin(Util.getMillis() / 2000f + 323) * 20f);
         float y = (float) (Math.sin(Util.getMillis() / 2000f) * 20f);
 
-        System.out.println(state.playerClose);
+        //System.out.println(state.playerClose);
 
         poseStack.mulPose(Axis.XP.rotationDegrees(x + (1f - state.playerClose) * 90f));
         poseStack.mulPose(Axis.YP.rotationDegrees(y));
@@ -75,7 +74,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity, Alta
         this.blockModelResolver.updateForItemFrame(state.frameModel, false, false);
         state.offset = be.tickOffset;
         state.playerClose = Mth.lerp(partialTicks, be.playerCloseOld, be.playerClose);
-        if(be.getLevel().getBlockState(be.getBlockPos()).is(EssenceBlocks.ALTAR))
+        if (be.getLevel().getBlockState(be.getBlockPos()).is(EssenceBlocks.ALTAR))
             state.part = be.getLevel().getBlockState(be.getBlockPos()).getValue(AltarBlock.PART);
         else
             state.part = AltarBlock.AltarPart.ALTAR;

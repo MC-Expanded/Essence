@@ -1,8 +1,6 @@
 package net.mcexpanded.essence;
 
-import net.mcexpanded.essence.altar.AltarRenderer;
-import net.mcexpanded.essence.altar.AltarScreen;
-import net.mcexpanded.essence.altar.SpinningItemPictureInPictureRenderer;
+import net.mcexpanded.essence.block.altar.AltarRenderer;
 import net.mcexpanded.essence.registry.EssenceBlockEntities;
 import net.mcexpanded.essence.registry.EssenceMenuTypes;
 import net.neoforged.api.distmarker.Dist;

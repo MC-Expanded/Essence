@@ -1,7 +1,6 @@
 package net.mcexpanded.essence.registry;
 
 import net.mcexpanded.essence.Essence;
-import net.mcexpanded.essence.altar.AltarMenu;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
