@@ -3,6 +3,7 @@ package net.mcexpanded.essence.block.altar;
 import net.minecraft.client.renderer.block.BlockModelRenderState;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
+import org.joml.Vector3f;
 
 public class AltarRenderState extends BlockEntityRenderState
 {
@@ -10,4 +11,5 @@ public class AltarRenderState extends BlockEntityRenderState
     public final ItemStackRenderState item = new ItemStackRenderState();
     public int offset;
     public float playerClose;
+    public Vector3f playerPos;
 }

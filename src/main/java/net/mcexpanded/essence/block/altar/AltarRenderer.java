@@ -2,24 +2,23 @@ package net.mcexpanded.essence.block.altar;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
 import net.mcexpanded.essence.Essence;
 import net.mcexpanded.essence.compat.IrisCompat;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.util.Mth;
-import net.minecraft.util.Util;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.ModList;
+import org.joml.Vector3f;
 import org.jspecify.annotations.Nullable;
 
-import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity, AltarRenderState>
@@ -44,24 +43,8 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity, Alta
                 cameraPosition,
                 breakProgress
         );
-    }
 
-    private static void submitFace(PoseStack ps, SubmitNodeCollector collector, Vec3 blockCenter, int light)
-    {
-        collector.submitCustomGeometry(ps, RenderTypes.entityCutout(Essence.rl("textures/pane_base.png")), (pose, buffer) ->
-        {
-            float subsections = 0.5f;
-            for (float i = -5; i < 5; i += subsections)
-            {
-                for (float j = -5; j < 5; j += subsections)
-                {
-                    addVertex(pose, buffer, 0.0F + i, 0.0F + j, light);
-                    addVertex(pose, buffer, subsections + i, 0.0F + j, light);
-                    addVertex(pose, buffer, subsections + i, subsections + j, light);
-                    addVertex(pose, buffer, 0.0F + i, subsections + j, light);
-                }
-            }
-        });
+        state.playerPos = Minecraft.getInstance().player == null ? new Vector3f() : Minecraft.getInstance().player.getPosition(partialTicks).toVector3f();
     }
 
     private static void addVertex(PoseStack.Pose pose, VertexConsumer buffer, float x, float z, int light)
@@ -87,39 +70,84 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity, Alta
     }
 
     @Override
-    public void submit(AltarRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera)
+    public void submit(AltarRenderState state, PoseStack ps, SubmitNodeCollector collector, CameraRenderState camera)
     {
-        poseStack.pushPose();
+        ps.pushPose();
 
         //if iris, use lower light so it doesn't look as bright, otherwise use block light
         int light = ModList.get().isLoaded("iris") && IrisCompat.isShaderPackInUse() ? 0xF000D8 : state.lightCoords;
 
-        submitFace(poseStack, submitNodeCollector, state.blockPos.getCenter(), light);
+        collector.submitCustomGeometry(ps, RenderTypes.entityCutout(Essence.rl("textures/pane_base.png")), (pose, buffer) ->
+        {
+            float subsections = 0.5f;
+            for (float i = -5; i < 5; i += subsections)
+            {
+                for (float j = -5; j < 5; j += subsections)
+                {
+                    addVertex(pose, buffer, state.playerPos.x() + i, state.playerPos.z() + j, light);
+                    addVertex(pose, buffer, state.playerPos.x() + subsections + i, state.playerPos.z() + j, light);
+                    addVertex(pose, buffer, state.playerPos.x() + subsections + i, state.playerPos.z() + subsections + j, light);
+                    addVertex(pose, buffer, state.playerPos.x() + i, state.playerPos.z() + subsections + j, light);
+                }
+            }
+        });
 
-        poseStack.popPose();
+        ps.popPose();
     }
 
     private static final int COLOR_1 = 0x0a1144;
-    private static final int COLOR_2 = 0x060028;
+    private static final int COLOR_2 = 0x6f2da8;
 
-    // --- Tuning knobs ---
-    // Smaller = larger, smoother blobs. Bigger = more, smaller blobs.
-    private static final double NOISE_SCALE = 0.3;
-    // Smaller = slower morphing animation.
-    private static final double TIME_SCALE = 0.2;
-    // >1 sharpens the transition between colors (more solid blobs, less muddy blend).
+    private static final double NOISE_SCALE = 0.2;
+    private static final double TIME_SCALE = 0.5;
     private static final double CONTRAST = 1;
+
+    private static final Map<CacheKey, Integer> colorCache = new HashMap<>();
+    private static long cacheTimestampNanos;
+    private static boolean cacheInitialized = false;
+    private static double currentTime;
+
+    private record CacheKey(double x, double y)
+    {
+    }
 
     public static int getColor(double x, double y)
     {
-        double t = System.nanoTime() * 1e-9 * TIME_SCALE;
+        refreshCacheIfStale();
 
+        CacheKey key = new CacheKey(x, y);
+        Integer cached = colorCache.get(key);
+        if (cached != null)
+        {
+            return cached;
+        }
+
+        int color = computeColor(x, y, currentTime);
+        colorCache.put(key, color);
+        return color;
+    }
+
+    private static void refreshCacheIfStale()
+    {
+        long now = System.nanoTime();
+        if (cacheInitialized && now - cacheTimestampNanos < 4000000L)
+            return;
+
+
+        cacheInitialized = true;
+        cacheTimestampNanos = now;
+        currentTime = now * 1e-9 * TIME_SCALE;
+        colorCache.clear();
+    }
+
+    private static int computeColor(double x, double y, double t)
+    {
         double n = perlin3D(x * NOISE_SCALE, y * NOISE_SCALE, t);
 
-        double blend = (n + 1.0) * 0.5;                 // roughly 0..1
-        blend = (blend - 0.5) * CONTRAST + 0.5;          // push toward extremes
+        double blend = (n + 1.0) * 0.5;
+        blend = (blend - 0.5) * CONTRAST + 0.5;
         blend = clamp01(blend);
-        blend = blend * blend * (3 - 2 * blend);         // smoothstep, softens edges
+        blend = blend * blend * (3 - 2 * blend);
 
         return lerpColor(COLOR_1, COLOR_2, blend);
     }
@@ -141,7 +169,6 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity, Alta
         return (r << 16) | (g << 8) | b;
     }
 
-    // ---- Perlin noise (Ken Perlin's "improved noise", 3D) ----
     private static final int[] PERM = new int[512];
 
     static
@@ -149,7 +176,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity, Alta
         int[] p = new int[256];
         for (int i = 0; i < 256; i++) p[i] = i;
 
-        Random rnd = new Random(42); // fixed seed -> same noise field every run
+        Random rnd = new Random(42);
         for (int i = 255; i > 0; i--)
         {
             int j = rnd.nextInt(i + 1);
